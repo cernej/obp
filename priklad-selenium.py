@@ -72,7 +72,38 @@ try:
         url = item.find_elements(By.CLASS_NAME, "calendars-item-button")
         if url:
             url = url[0].get_attribute("href")
-        print(f"Departure {departure}, arrival {arrival}, price {price}, url {url}")
+
+        if 'LCC' not in url:
+            continue
+
+        print(f"{departure} <-> {arrival} {price}, url {url}")
+
+        driver.get(url)
+
+        # test if there is departure element
+        WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.ID, "from"))
+        )
+
+        lowest_from = None
+        lowest_to = None
+
+        #driver.save_screenshot("screenshot-lcc.png")
+
+        frm = driver.find_elements(By.ID, "from")
+        if frm:
+            lowest_from = frm[0].find_elements(By.CLASS_NAME, "lowest")
+            if lowest_from:
+                lowest_from = lowest_from[0].text.strip().split()[0]
+
+        to = driver.find_elements(By.ID, "to")
+        if to:
+            lowest_to = to[0].find_elements(By.CLASS_NAME, "lowest")
+            if lowest_to:
+                lowest_to = lowest_to[0].text.strip().split()[0]
+
+        print(f'Lowest price on {lowest_from} <-> {lowest_to}')
+        break
 
 
     # if prices:
