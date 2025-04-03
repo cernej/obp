@@ -32,7 +32,6 @@ def create_flight(flight: Flight):
     flights_db.append(flight)
     return flight
 
-
 @app.delete("/flights/{flight_id}", tags=["Flights"])
 def delete_flight(flight_id: int):
     for index, flight in enumerate(flights_db):
