@@ -31,44 +31,58 @@ return_date = '2025-04-08'
 
 
 #url = f'https://www.ryanair.com/cz/cs/booking/home/{from_iata}/{to_iata}/{departure_date}/{return_date}/1/0/0/0'
-url = f'https://www.wizzair.com/en-gb/booking/select-flight/{from_iata}/{to_iata}/{departure_date}/{return_date}/1/0/0/null'
+#url = f'https://www.wizzair.com/en-gb/booking/select-flight/{from_iata}/{to_iata}/{departure_date}/{return_date}/1/0/0/null'
+url = 'https://www.pelikan.cz/cs/akcni-letenky/'
 driver.get(url)
 
-#time.sleep(5)
-
-print(driver.title)
 
 try:
     try:
-        cookie_button = WebDriverWait(driver, 5).until(
-            EC.presence_of_element_located((By.ID, "onetrust-reject-all-handler"))
+        cookie_button = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.ID, "codeblocks-accept-cookies"))
         )
-        print("Klikám na 'Odmítnout všechny cookies'...")
+        print("Klikám na 'Přijmout všechny cookies'...")
         cookie_button.click()
     except:
-        print("Tlačítko 'Odmítnout cookies' se nezobrazilo.")
+        print("Tlačítko 'Přijmout cookies' se nezobrazilo.")
 
-    time.sleep(5)
+    time.sleep(1)
     driver.save_screenshot("screenshot.png")
-
 
     # test if there is departure element
     WebDriverWait(driver, 10).until(
-        EC.presence_of_element_located((By.CLASS_NAME, "current-price"))
+        EC.presence_of_element_located((By.CLASS_NAME, "calendar-item-info-action"))
     )
 
-    print("Načteny ceny...")
+    print("Načítáme akce...")
 
-    prices = driver.find_elements(By.CLASS_NAME, "current-price")
+    items = driver.find_elements(By.CLASS_NAME, "calendar-item-info-action")
 
-    if prices:
-        print(f"Nalezeno {len(prices)} cen:")
-        for i, p in enumerate(prices, 1):
-            text = p.text.strip()
-            if text:
-                print(f"Cena #{i}: {text}")
-    else:
-        print("Žádné ceny nebyly nalezeny.")
+    print(f"Načteno {len(items)} akcí")
+
+    for item in items:
+        departure = item.find_elements(By.CLASS_NAME, "calendars-item-departure")
+        arrival = item.find_elements(By.CLASS_NAME, "calendars-item-arrival")
+        if departure and arrival:
+            departure = departure[0].text.strip().split()[0]
+            arrival = arrival[0].text.strip().split()[0]
+        price = item.find_elements(By.CLASS_NAME, "calendars-item-price-wrap")
+        if price:
+            price = price[0].text.strip()
+        url = item.find_elements(By.CLASS_NAME, "calendars-item-button")
+        if url:
+            url = url[0].get_attribute("href")
+        print(f"Departure {departure}, arrival {arrival}, price {price}, url {url}")
+
+
+    # if prices:
+    #     print(f"Nalezeno {len(prices)} cen:")
+    #     for i, p in enumerate(prices, 1):
+    #         text = p.text.strip()
+    #         if text:
+    #             print(f"Cena #{i}: {text}")
+    # else:
+    #     print("Žádné ceny nebyly nalezeny.")
 
 except Exception as e:
     print("Chyba při získávání dat:", e)

@@ -1,14 +1,15 @@
 def generuj_cisla(n):
     result = []
     for i in range(n):
-        result.append(i)
+        x = {"i": i}
+        result.append(x)
     return result
 
 
 def generuj_cisla2(n):
     for i in range(n):
-        yield i
+        yield {"i": i}
 
 
-for i in generuj_cisla(1000000):
+for i in generuj_cisla2(10000000):
     print(i)
