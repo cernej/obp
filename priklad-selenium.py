@@ -35,6 +35,9 @@ return_date = '2025-04-08'
 url = 'https://www.pelikan.cz/cs/akcni-letenky/'
 driver.get(url)
 
+#time.sleep(5)
+
+print(driver.title)
 
 try:
     try:
@@ -49,71 +52,26 @@ try:
     time.sleep(1)
     driver.save_screenshot("screenshot.png")
 
+
     # test if there is departure element
     WebDriverWait(driver, 10).until(
         EC.presence_of_element_located((By.CLASS_NAME, "calendar-item-info-action"))
     )
 
-    print("Načítáme akce...")
+    print("Načteny ceny...")
 
     items = driver.find_elements(By.CLASS_NAME, "calendar-item-info-action")
 
-    print(f"Načteno {len(items)} akcí")
+    print(f"Nelezeno ")
 
-    for item in items:
-        departure = item.find_elements(By.CLASS_NAME, "calendars-item-departure")
-        arrival = item.find_elements(By.CLASS_NAME, "calendars-item-arrival")
-        if departure and arrival:
-            departure = departure[0].text.strip().split()[0]
-            arrival = arrival[0].text.strip().split()[0]
-        price = item.find_elements(By.CLASS_NAME, "calendars-item-price-wrap")
-        if price:
-            price = price[0].text.strip()
-        url = item.find_elements(By.CLASS_NAME, "calendars-item-button")
-        if url:
-            url = url[0].get_attribute("href")
-
-        if 'LCC' not in url:
-            continue
-
-        print(f"{departure} <-> {arrival} {price}, url {url}")
-
-        driver.get(url)
-
-        # test if there is departure element
-        WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.ID, "from"))
-        )
-
-        lowest_from = None
-        lowest_to = None
-
-        #driver.save_screenshot("screenshot-lcc.png")
-
-        frm = driver.find_elements(By.ID, "from")
-        if frm:
-            lowest_from = frm[0].find_elements(By.CLASS_NAME, "lowest")
-            if lowest_from:
-                lowest_from = lowest_from[0].text.strip().split()[0]
-
-        to = driver.find_elements(By.ID, "to")
-        if to:
-            lowest_to = to[0].find_elements(By.CLASS_NAME, "lowest")
-            if lowest_to:
-                lowest_to = lowest_to[0].text.strip().split()[0]
-
-        print(f'Lowest price on {lowest_from} <-> {lowest_to}')
-        break
-
-
-    # if prices:
-    #     print(f"Nalezeno {len(prices)} cen:")
-    #     for i, p in enumerate(prices, 1):
-    #         text = p.text.strip()
-    #         if text:
-    #             print(f"Cena #{i}: {text}")
-    # else:
-    #     print("Žádné ceny nebyly nalezeny.")
+    if prices:
+        print(f"Nalezeno {len(prices)} cen:")
+        for i, p in enumerate(prices, 1):
+            text = p.text.strip()
+            if text:
+                print(f"Cena #{i}: {text}")
+    else:
+        print("Žádné ceny nebyly nalezeny.")
 
 except Exception as e:
     print("Chyba při získávání dat:", e)
